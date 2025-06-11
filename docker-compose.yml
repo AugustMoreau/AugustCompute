@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - CORS_ORIGIN=http://localhost:3000
+      # Add other environment variables as needed
+    restart: unless-stopped
+    volumes:
+      - ./backend/.env:/app/.env:ro
+
+  # Optional: Local blockchain for development/testing
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    ports:
+      - "8545:8545"
+    command: --deterministic --networkId 1337 --chainId 1337 --hostname 0.0.0.0
+    restart: unless-stopped
+
+networks:
+  default:
+    name: augustcompute-network 
